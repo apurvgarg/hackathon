@@ -3,16 +3,17 @@ import { LAYOUT_NAME } from '../../domain/layout';
 import { StudioStore } from '../../state/studio.store';
 import { CrewPicker } from './crew-picker';
 import { ExportBar } from './export-bar';
+import { MobileActionBar } from './mobile-action-bar';
 import { SheetPreview } from './sheet-preview';
 import { SlotPanel } from './slot-panel';
 
 @Component({
   selector: 'hh-studio-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CrewPicker, SlotPanel, SheetPreview, ExportBar],
+  imports: [CrewPicker, SlotPanel, SheetPreview, ExportBar, MobileActionBar],
   host: { '(document:paste)': 'onPaste($event)' },
   template: `
-    <div class="mx-auto max-w-[1720px] px-4 py-6 sm:px-6 sm:py-10">
+    <div class="mx-auto max-w-[1720px] px-4 pb-40 pt-6 sm:px-6 sm:pt-10 lg:pb-10">
       <div class="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 class="font-display text-4xl leading-none text-sun sm:text-5xl">THE STUDIO</h1>
@@ -47,11 +48,13 @@ import { SlotPanel } from './slot-panel';
         <div class="order-1 lg:order-2 lg:sticky lg:top-28 lg:self-start">
           <div class="mx-auto max-w-[1060px] space-y-4">
             <hh-sheet-preview />
-            <hh-export-bar />
+            <hh-export-bar class="hidden lg:block" />
           </div>
         </div>
       </div>
     </div>
+
+    <hh-mobile-action-bar />
   `,
 })
 export class StudioPage implements OnInit {

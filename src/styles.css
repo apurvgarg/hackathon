@@ -115,7 +115,8 @@ hh-slot-panel,
 hh-dropzone,
 hh-stack-picker,
 hh-sheet-preview,
-hh-export-bar {
+hh-export-bar,
+hh-mobile-action-bar {
   display: block;
 }
 
