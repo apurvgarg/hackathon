@@ -63,6 +63,7 @@ export class VisionClient {
 
   warmup(): void {
     const worker = this.ensure();
+    // ensure code
     if (!worker) return;
     worker.postMessage({ kind: 'warm', id: ++this.ticket });
   }

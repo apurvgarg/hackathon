@@ -8,27 +8,24 @@ import { STACK_PRINT_LIMIT, TECH_BY_ID, TECH_GROUPS, VIBES } from '../../domain/
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="space-y-5">
-      <div class="flex items-baseline justify-between gap-2">
-        <p class="text-[11px] tracked text-paper/60">BEACH BAG</p>
-        <p class="text-[10px] tracked text-paper/40">
-          {{ chosen().length }} TAGGED
-          @if (chosen().length > printLimit) {
-            <span class="text-sun/70">· {{ printLimit }} PRINT</span>
-          }
-        </p>
-      </div>
-
       @if (chosen().length) {
-        <div class="flex flex-wrap gap-2 border-b-2 border-paper/10 pb-4">
-          @for (id of chosen(); track id) {
-            <button
-              type="button"
-              (click)="store.toggleTech(slot(), id)"
-              class="press flex items-center gap-1.5 rounded-full border-2 border-ink bg-sun px-2.5 py-1 text-[10px] font-bold text-ink"
-            >
-              {{ labelOf(id) }}
-              <span class="text-neon-deep">✕</span>
-            </button>
+        <div class="space-y-2 border-b-2 border-paper/10 pb-4">
+          <div class="flex flex-wrap gap-2">
+            @for (id of chosen(); track id) {
+              <button
+                type="button"
+                (click)="store.toggleTech(slot(), id)"
+                class="press flex items-center gap-1.5 rounded-full border-2 border-ink bg-sun px-2.5 py-1 text-[10px] font-bold text-ink"
+              >
+                {{ labelOf(id) }}
+                <span class="text-neon-deep">✕</span>
+              </button>
+            }
+          </div>
+          @if (chosen().length > printLimit) {
+            <p class="text-[10px] text-sun/70">
+              first {{ printLimit }} print on the sheet
+            </p>
           }
         </div>
       }
