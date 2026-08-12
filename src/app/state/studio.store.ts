@@ -68,6 +68,8 @@ export class StudioStore {
   readonly rendering = signal(false);
   readonly qrReady = signal(false);
 
+  private readonly active = signal(false);
+
   readonly activeSlots = computed<Slot[]>(() => SLOTS.slice(0, this.crew()) as Slot[]);
   readonly activeInputs = computed(() => this.activeSlots().map((s) => this.inputs()[s]));
 
@@ -140,14 +142,20 @@ export class StudioStore {
   private paintToken = 0;
 
   constructor() {
+    effect(() => {
+      const live = this.active();
+      const hash = this.specHash();
+      if (!live) return;
+      untracked(() => this.schedule(hash));
+    });
+  }
+
+  activate(): void {
+    if (this.active()) return;
     void loadQrFactory().then((factory) => {
       if (factory) this.qrReady.set(true);
     });
-
-    effect(() => {
-      const hash = this.specHash();
-      untracked(() => this.schedule(hash));
-    });
+    this.active.set(true);
   }
 
   private schedule(hash: number): void {

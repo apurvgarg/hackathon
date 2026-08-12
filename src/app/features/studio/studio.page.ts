@@ -73,6 +73,7 @@ export class StudioPage implements OnInit {
   readonly openSlot = computed<Slot>(() => (this.store.crew() === 1 ? 0 : this.requested()));
 
   ngOnInit(): void {
+    this.store.activate();
     this.store.warmupVision();
   }
 

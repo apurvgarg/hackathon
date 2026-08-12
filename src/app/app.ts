@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
@@ -12,7 +12,7 @@ import { Toaster } from './ui/toaster';
   imports: [RouterOutlet, RouterLink, RouterLinkActive, Toaster],
   templateUrl: './app.html',
 })
-export class App implements OnInit {
+export class App {
   readonly store = inject(StudioStore);
   readonly actions = inject(ExportActions);
   private readonly router = inject(Router);
@@ -27,10 +27,6 @@ export class App implements OnInit {
         takeUntilDestroyed(),
       )
       .subscribe(() => this.sync());
-  }
-
-  ngOnInit(): void {
-    this.store.warmupVision();
   }
 
   private sync(): void {
