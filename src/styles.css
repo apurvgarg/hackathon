@@ -102,22 +102,25 @@
   }
 }
 
-app-root,
-hh-toaster,
-hh-marquee,
-hh-landing-page,
-hh-studio-page,
-hh-about-page,
-hh-about-section,
-hh-member-sticker,
-hh-crew-picker,
-hh-slot-panel,
-hh-dropzone,
-hh-stack-picker,
-hh-sheet-preview,
-hh-export-bar,
-hh-mobile-action-bar {
-  display: block;
+@layer base {
+  app-root,
+  hh-toaster,
+  hh-marquee,
+  hh-landing-page,
+  hh-studio-page,
+  hh-about-page,
+  hh-about-section,
+  hh-member-sticker,
+  hh-crew-picker,
+  hh-slot-panel,
+  hh-dropzone,
+  hh-face-chooser,
+  hh-stack-picker,
+  hh-sheet-preview,
+  hh-export-bar,
+  hh-mobile-action-bar {
+    display: block;
+  }
 }
 
 :root {

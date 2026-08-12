@@ -16,9 +16,9 @@ export type VisionRequest = DetectRequest | WarmRequest;
 export interface DetectResult {
   kind: 'detected';
   id: number;
-  face: FaceBox | null;
-  landmarks: Landmarks | null;
-  candidates: number;
+  faces: FaceBox[];
+  landmarks: (Landmarks | null)[];
+  chosen: number;
   ambiguous: boolean;
   degraded: boolean;
 }

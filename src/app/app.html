@@ -2,19 +2,19 @@
 
 <header class="sticky top-[13px] z-30 border-b-2 border-ink/20 bg-goa/95 backdrop-blur">
   <nav class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-    <a routerLink="/" class="group flex items-baseline gap-2">
-      <span class="font-display text-2xl leading-none text-sun sm:text-3xl">HACKER HOUSE</span>
+    <a routerLink="/" class="group flex shrink-0 items-baseline gap-1.5 whitespace-nowrap">
+      <span class="font-display text-lg leading-none text-sun sm:text-3xl">HACKER HOUSE</span>
       <span
-        class="font-deva rounded-lg border-2 border-neon bg-paper px-1.5 pb-0.5 text-sm font-extrabold text-neon transition-transform group-hover:-rotate-6"
+        class="font-deva rounded-md border-2 border-neon bg-paper px-1 pb-0.5 text-[11px] font-extrabold text-neon transition-transform group-hover:-rotate-6 sm:rounded-lg sm:px-1.5 sm:text-sm"
         >गोवा</span
       >
     </a>
 
-    <div class="flex items-center gap-1 sm:gap-3">
+    <div class="flex shrink-0 items-center gap-1 sm:gap-3">
       <a
         routerLink="/about"
         routerLinkActive="text-sun"
-        class="px-2 py-1 text-[11px] tracked text-paper/70 transition hover:text-sun sm:text-xs"
+        class="px-1.5 py-1 text-[10px] tracked text-paper/70 transition hover:text-sun sm:px-2 sm:text-xs"
         >THE CREW</a
       >
       <a
@@ -24,11 +24,13 @@
         class="hidden px-2 py-1 text-[11px] tracked text-paper/70 transition hover:text-sun sm:block sm:text-xs"
         >HHGOA.COM</a
       >
-      <a
-        routerLink="/studio"
-        class="press border-2 border-ink bg-sun px-3 py-2 text-[11px] font-bold tracked text-ink hard-shadow-sm sm:px-4 sm:text-xs"
-        >MAKE A SHEET</a
-      >
+      @if (!inStudio()) {
+        <a
+          routerLink="/studio"
+          class="press border-2 border-ink bg-sun px-2.5 py-1.5 text-[10px] font-bold tracked text-ink hard-shadow-sm sm:px-4 sm:py-2 sm:text-xs"
+          >MAKE A SHEET</a
+        >
+      }
     </div>
   </nav>
 </header>

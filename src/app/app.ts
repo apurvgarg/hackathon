@@ -1,5 +1,7 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs';
 import { StudioStore } from './state/studio.store';
 import { Toaster } from './ui/toaster';
 
@@ -11,8 +13,25 @@ import { Toaster } from './ui/toaster';
 })
 export class App implements OnInit {
   private readonly store = inject(StudioStore);
+  private readonly router = inject(Router);
+
+  readonly inStudio = signal(false);
+
+  constructor() {
+    this.sync();
+    this.router.events
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        takeUntilDestroyed(),
+      )
+      .subscribe(() => this.sync());
+  }
 
   ngOnInit(): void {
     this.store.warmupVision();
+  }
+
+  private sync(): void {
+    this.inStudio.set(this.router.url.startsWith('/studio'));
   }
 }

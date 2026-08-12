@@ -30,14 +30,17 @@ function emptyPhoto(slot: Slot): PhotoAsset {
   return {
     slot,
     blob: null,
+    url: null,
     width: 0,
     height: 0,
+    faces: [],
+    allLandmarks: [],
+    chosenFace: -1,
     face: null,
     landmarks: null,
     crop: null,
     status: 'empty',
     message: '',
-    candidates: 0,
   };
 }
 
@@ -203,12 +206,35 @@ export class StudioStore {
   }
 
   clearPhoto(slot: Slot): void {
+    this.revokeUrl(slot);
     this.patchPhoto(slot, emptyPhoto(slot));
     void this.render.setPhoto(slot, null);
   }
 
+  private revokeUrl(slot: Slot): void {
+    const url = this.photos()[slot].url;
+    if (url) URL.revokeObjectURL(url);
+  }
+
+  chooseFace(slot: Slot, index: number): void {
+    const photo = this.photos()[slot];
+    const face = photo.faces[index];
+    if (!face || index === photo.chosenFace) return;
+
+    const landmarks = photo.allLandmarks[index] ?? null;
+    this.patchPhoto(slot, {
+      chosenFace: index,
+      face,
+      landmarks,
+      crop: solveFaceCrop(face, landmarks, photo.width, photo.height),
+      status: 'ready',
+      message: 'face locked',
+    });
+  }
+
   async acceptFile(slot: Slot, file: File): Promise<void> {
-    this.patchPhoto(slot, { status: 'decoding', message: 'reading', blob: null });
+    this.revokeUrl(slot);
+    this.patchPhoto(slot, { status: 'decoding', message: 'reading', blob: null, url: null });
 
     let source: Awaited<ReturnType<typeof prepareSource>>;
     try {
@@ -224,6 +250,7 @@ export class StudioStore {
 
     this.patchPhoto(slot, {
       blob: source.blob,
+      url: URL.createObjectURL(source.blob),
       width: source.width,
       height: source.height,
       status: 'detecting',
@@ -234,17 +261,20 @@ export class StudioStore {
     await this.render.setPhoto(slot, source.blob);
 
     const result = await this.vision.detect(source.blob);
-    const crop = solveFaceCrop(result.face, result.landmarks, source.width, source.height);
+    const face = result.chosen >= 0 ? result.faces[result.chosen] : null;
+    const landmarks = result.chosen >= 0 ? (result.landmarks[result.chosen] ?? null) : null;
 
     this.patchPhoto(slot, {
-      face: result.face,
-      landmarks: result.landmarks,
-      crop,
-      candidates: result.candidates,
-      status: result.face ? 'ready' : 'no-face',
-      message: result.face
-        ? result.ambiguous
-          ? `${result.candidates} faces found, using the clearest`
+      faces: result.faces,
+      allLandmarks: result.landmarks,
+      chosenFace: result.chosen,
+      face,
+      landmarks,
+      crop: solveFaceCrop(face, landmarks, source.width, source.height),
+      status: face ? 'ready' : 'no-face',
+      message: face
+        ? result.faces.length > 1
+          ? `${result.faces.length} people here — pick yours`
           : 'face locked'
         : result.degraded
           ? 'detector offline, centred instead'

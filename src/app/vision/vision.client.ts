@@ -38,9 +38,9 @@ export class VisionClient {
     return {
       kind: 'detected',
       id,
-      face: null,
-      landmarks: null,
-      candidates: 0,
+      faces: [],
+      landmarks: [],
+      chosen: -1,
       ambiguous: false,
       degraded,
     };

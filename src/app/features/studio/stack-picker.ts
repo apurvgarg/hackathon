@@ -7,7 +7,7 @@ import { STACK_PRINT_LIMIT, TECH_BY_ID, TECH_GROUPS, VIBES } from '../../domain/
   selector: 'hh-stack-picker',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="space-y-5">
+    <div class="space-y-4">
       @if (chosen().length) {
         <div class="space-y-2 border-b-2 border-paper/10 pb-4">
           <div class="flex flex-wrap gap-2">
@@ -23,9 +23,7 @@ import { STACK_PRINT_LIMIT, TECH_BY_ID, TECH_GROUPS, VIBES } from '../../domain/
             }
           </div>
           @if (chosen().length > printLimit) {
-            <p class="text-[10px] text-sun/70">
-              first {{ printLimit }} print on the sheet
-            </p>
+            <p class="text-[10px] text-sun/70">first {{ printLimit }} print on the sheet</p>
           }
         </div>
       }
@@ -38,37 +36,61 @@ import { STACK_PRINT_LIMIT, TECH_BY_ID, TECH_GROUPS, VIBES } from '../../domain/
         class="w-full border-2 border-paper/25 bg-goa-deep px-3 py-2 text-xs text-paper placeholder:text-paper/30 focus:border-sun"
       />
 
-      <div class="max-h-[19rem] space-y-4 overflow-y-auto no-scrollbar pr-1">
+      <div>
         @for (group of visibleGroups(); track group.id) {
-          <div>
-            <p class="mb-2 text-[9px] tracked-wide text-sun/60">{{ group.label }}</p>
-            <div class="flex flex-wrap gap-2">
-              @for (tag of group.tags; track tag.id) {
-                <button
-                  type="button"
-                  (click)="store.toggleTech(slot(), tag.id)"
-                  [attr.aria-pressed]="chosen().includes(tag.id)"
-                  class="press rounded-full border-2 px-2.5 py-1 text-[10px] font-bold"
-                  [class]="
-                    chosen().includes(tag.id)
-                      ? 'border-ink bg-sun text-ink'
-                      : 'border-paper/30 text-paper/70 hover:border-sun hover:text-sun'
-                  "
+          <div class="border-b border-paper/10 last:border-0" [class.pb-3]="isOpen(group.id)">
+            <button
+              type="button"
+              (click)="toggle(group.id)"
+              class="group flex w-full items-center justify-between gap-2 py-2.5 text-left"
+            >
+              <span
+                class="text-[10px] tracked-wide transition"
+                [class]="isOpen(group.id) ? 'text-sun' : 'text-sun/60 group-hover:text-sun'"
+                >{{ group.label }}</span
+              >
+
+              <span class="flex items-center gap-2">
+                @if (countIn(group.id)) {
+                  <span class="rounded-full bg-sun px-1.5 py-px text-[9px] font-bold text-ink">{{
+                    countIn(group.id)
+                  }}</span>
+                }
+                <span
+                  class="w-3 text-center text-[13px] leading-none transition"
+                  [class]="isOpen(group.id) ? 'text-sun' : 'text-paper/40 group-hover:text-sun'"
+                  >{{ isOpen(group.id) ? '−' : '+' }}</span
                 >
-                  {{ tag.label }}
-                </button>
-              }
-            </div>
+              </span>
+            </button>
+
+            @if (isOpen(group.id)) {
+              <div class="flex flex-wrap gap-2">
+                @for (tag of group.tags; track tag.id) {
+                  <button
+                    type="button"
+                    (click)="store.toggleTech(slot(), tag.id)"
+                    [attr.aria-pressed]="chosen().includes(tag.id)"
+                    class="press rounded-full border-2 px-2.5 py-1 text-[10px] font-bold"
+                    [class]="
+                      chosen().includes(tag.id)
+                        ? 'border-ink bg-sun text-ink'
+                        : 'border-paper/30 text-paper/70 hover:border-sun hover:text-sun'
+                    "
+                  >
+                    {{ tag.label }}
+                  </button>
+                }
+              </div>
+            }
           </div>
         } @empty {
-          <p class="py-4 text-center text-[11px] text-paper/40">
-            nothing matches “{{ query() }}”
-          </p>
+          <p class="py-4 text-center text-[11px] text-paper/40">nothing matches “{{ query() }}”</p>
         }
       </div>
 
-      <div class="pt-1">
-        <p class="mb-2 text-[9px] tracked-wide text-sun/60">ONE VIBE</p>
+      <div class="border-t border-paper/10 pt-4">
+        <p class="mb-2 text-[10px] tracked-wide text-sun/60">ONE VIBE</p>
         <div class="flex flex-wrap gap-2">
           @for (vibe of vibes; track vibe.id) {
             <button
@@ -92,25 +114,38 @@ import { STACK_PRINT_LIMIT, TECH_BY_ID, TECH_GROUPS, VIBES } from '../../domain/
 })
 export class StackPicker {
   readonly store = inject(StudioStore);
+
   readonly slot = input.required<Slot>();
 
   readonly vibes = VIBES;
   readonly printLimit = STACK_PRINT_LIMIT;
   readonly query = signal('');
+  private readonly expanded = signal<string | null>(null);
 
   readonly chosen = computed(() => this.store.inputs()[this.slot()].stack);
   readonly current = computed(() => this.store.inputs()[this.slot()].vibe);
+  private readonly filtering = computed(() => this.query().trim().length > 0);
 
   readonly visibleGroups = computed(() => {
     const q = this.query().trim().toLowerCase();
     if (!q) return TECH_GROUPS;
     return TECH_GROUPS.map((group) => ({
       ...group,
-      tags: group.tags.filter(
-        (tag) => tag.label.toLowerCase().includes(q) || tag.id.includes(q),
-      ),
+      tags: group.tags.filter((tag) => tag.label.toLowerCase().includes(q) || tag.id.includes(q)),
     })).filter((group) => group.tags.length > 0);
   });
+
+  isOpen(id: string): boolean {
+    return this.filtering() || this.expanded() === id;
+  }
+
+  countIn(groupId: string): number {
+    return this.chosen().filter((id) => TECH_BY_ID.get(id)?.group === groupId).length;
+  }
+
+  toggle(id: string): void {
+    this.expanded.update((current) => (current === id ? null : id));
+  }
 
   labelOf(id: string): string {
     return TECH_BY_ID.get(id)?.label ?? id;

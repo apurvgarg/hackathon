@@ -59,12 +59,26 @@ export function solveFaceCrop(
   return { sx, sy, sw: side, sh: side, roll: solveRoll(landmarks) };
 }
 
-export function pickPrimaryFace(faces: FaceBox[]): { face: FaceBox | null; ambiguous: boolean } {
-  if (!faces.length) return { face: null, ambiguous: false };
-  const sorted = [...faces].sort((a, b) => b.score * b.w * b.h - a.score * a.w * a.h);
-  const best = sorted[0];
-  const runner = sorted[1];
-  const ambiguous =
-    !!runner && runner.score * runner.w * runner.h > best.score * best.w * best.h * 0.85;
-  return { face: best, ambiguous };
+export function faceWeight(face: FaceBox): number {
+  return face.score * face.w * face.h;
+}
+
+export function pickPrimaryFace(faces: FaceBox[]): { index: number; ambiguous: boolean } {
+  if (!faces.length) return { index: -1, ambiguous: false };
+
+  let best = 0;
+  for (let i = 1; i < faces.length; i++) {
+    if (faceWeight(faces[i]) > faceWeight(faces[best])) best = i;
+  }
+
+  let runner = -1;
+  for (let i = 0; i < faces.length; i++) {
+    if (i === best) continue;
+    if (runner === -1 || faceWeight(faces[i]) > faceWeight(faces[runner])) runner = i;
+  }
+
+  return {
+    index: best,
+    ambiguous: runner !== -1 && faceWeight(faces[runner]) > faceWeight(faces[best]) * 0.85,
+  };
 }

@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { LAYOUT_NAME } from '../../domain/layout';
+import { CrewSize, Slot } from '../../domain/models';
 import { StudioStore } from '../../state/studio.store';
 import { CrewPicker } from './crew-picker';
 import { ExportBar } from './export-bar';
@@ -13,26 +14,33 @@ import { SlotPanel } from './slot-panel';
   imports: [CrewPicker, SlotPanel, SheetPreview, ExportBar, MobileActionBar],
   host: { '(document:paste)': 'onPaste($event)' },
   template: `
-    <div class="mx-auto max-w-[1720px] px-4 pb-40 pt-6 sm:px-6 sm:pt-10 lg:pb-10">
-      <div class="mb-6 flex flex-wrap items-end justify-between gap-3">
+    <div class="mx-auto max-w-[1720px] px-4 pb-40 pt-5 sm:px-6 sm:pt-10 lg:pb-10">
+      <div class="mb-5 flex flex-wrap items-end justify-between gap-3 sm:mb-6">
         <div>
-          <h1 class="font-display text-4xl leading-none text-sun sm:text-5xl">THE STUDIO</h1>
-          <p class="mt-1 text-[11px] tracked text-paper/50">
+          <h1 class="font-display text-3xl leading-none text-sun sm:text-5xl">THE STUDIO</h1>
+          <p class="mt-1 text-[10px] tracked text-paper/50 sm:text-[11px]">
             {{ LAYOUT[store.crew()] }} SHEET · ONE CARD FOR THE WHOLE CREW
           </p>
         </div>
-        <p class="text-[10px] tracked text-paper/35">
+        <p class="hidden text-[10px] tracked text-paper/35 lg:block">
           PASTE AN IMAGE ANYWHERE TO FILL THE NEXT EMPTY SLOT
         </p>
       </div>
 
       <div class="grid gap-6 lg:grid-cols-[minmax(0,480px)_minmax(0,1fr)] lg:gap-8">
-        <div class="order-2 space-y-7 lg:order-1">
+        <div class="order-2 space-y-6 lg:order-1 lg:space-y-7">
           <hh-crew-picker />
 
-          @for (slot of store.activeSlots(); track slot) {
-            <hh-slot-panel [slot]="slot" />
-          }
+          <div class="space-y-3 lg:space-y-7">
+            @for (slot of store.activeSlots(); track slot) {
+              <hh-slot-panel
+                [slot]="slot"
+                [open]="openSlot() === slot"
+                [collapsible]="store.crew() > 1"
+                (toggled)="toggleSlot(slot)"
+              />
+            }
+          </div>
 
           @if (store.crew() < 3) {
             <button
@@ -61,13 +69,23 @@ export class StudioPage implements OnInit {
   readonly store = inject(StudioStore);
   readonly LAYOUT = LAYOUT_NAME;
 
+  private readonly requested = signal<Slot>(0);
+  readonly openSlot = computed<Slot>(() => (this.store.crew() === 1 ? 0 : this.requested()));
+
   ngOnInit(): void {
     this.store.warmupVision();
   }
 
+  toggleSlot(slot: Slot): void {
+    if (this.store.crew() === 1) return;
+    this.requested.set(this.requested() === slot ? (-1 as Slot) : slot);
+  }
+
   addBuilder(): void {
     const next = this.store.crew() + 1;
-    if (next === 2 || next === 3) this.store.setCrew(next);
+    if (next !== 2 && next !== 3) return;
+    this.store.setCrew(next as CrewSize);
+    this.requested.set((next - 1) as Slot);
   }
 
   onPaste(event: ClipboardEvent): void {
@@ -81,5 +99,6 @@ export class StudioPage implements OnInit {
       this.store.activeSlots().find((slot) => !this.store.photos()[slot].blob) ??
       this.store.activeSlots()[0];
     void this.store.acceptFile(target, file);
+    this.requested.set(target);
   }
 }

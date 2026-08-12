@@ -53,14 +53,17 @@ export interface BuilderClass {
 export interface PhotoAsset {
   slot: Slot;
   blob: Blob | null;
+  url: string | null;
   width: number;
   height: number;
+  faces: FaceBox[];
+  allLandmarks: (Landmarks | null)[];
+  chosenFace: number;
   face: FaceBox | null;
   landmarks: Landmarks | null;
   crop: CropRect | null;
   status: PhotoStatus;
   message: string;
-  candidates: number;
 }
 
 export interface CrewSynergy {
