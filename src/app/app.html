@@ -1,0 +1,49 @@
+<div class="truck-band sticky top-0 z-40"></div>
+
+<header class="sticky top-[13px] z-30 border-b-2 border-ink/20 bg-goa/95 backdrop-blur">
+  <nav class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+    <a routerLink="/" class="group flex items-baseline gap-2">
+      <span class="font-display text-2xl leading-none text-sun sm:text-3xl">HACKER HOUSE</span>
+      <span
+        class="font-deva rounded-lg border-2 border-neon bg-paper px-1.5 pb-0.5 text-sm font-extrabold text-neon transition-transform group-hover:-rotate-6"
+        >गोवा</span
+      >
+    </a>
+
+    <div class="flex items-center gap-1 sm:gap-3">
+      <a
+        routerLink="/about"
+        routerLinkActive="text-sun"
+        class="px-2 py-1 text-[11px] tracked text-paper/70 transition hover:text-sun sm:text-xs"
+        >THE CREW</a
+      >
+      <a
+        href="https://hhgoa.com"
+        target="_blank"
+        rel="noopener"
+        class="hidden px-2 py-1 text-[11px] tracked text-paper/70 transition hover:text-sun sm:block sm:text-xs"
+        >HHGOA.COM</a
+      >
+      <a
+        routerLink="/studio"
+        class="press border-2 border-ink bg-sun px-3 py-2 text-[11px] font-bold tracked text-ink hard-shadow-sm sm:px-4 sm:text-xs"
+        >MAKE A SHEET</a
+      >
+    </div>
+  </nav>
+</header>
+
+<main class="min-h-[70vh]">
+  <router-outlet />
+</main>
+
+<footer class="border-t-2 border-ink/20 bg-goa-deep">
+  <div
+    class="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-8 text-[11px] tracked text-paper/55 sm:flex-row sm:items-center sm:justify-between sm:px-6"
+  >
+    <span>गोवा SQUAD SHEET · BUILT BY SINEWAVE SYNDICATE</span>
+    <span class="text-neon">#FRAMEINGOA</span>
+  </div>
+</footer>
+
+<hh-toaster />
