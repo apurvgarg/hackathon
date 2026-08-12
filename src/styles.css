@@ -102,6 +102,23 @@
   }
 }
 
+app-root,
+hh-toaster,
+hh-marquee,
+hh-landing-page,
+hh-studio-page,
+hh-about-page,
+hh-about-section,
+hh-member-sticker,
+hh-crew-picker,
+hh-slot-panel,
+hh-dropzone,
+hh-stack-picker,
+hh-sheet-preview,
+hh-export-bar {
+  display: block;
+}
+
 :root {
   color-scheme: only light;
 }

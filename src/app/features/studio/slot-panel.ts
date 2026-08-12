@@ -23,7 +23,7 @@ import { StackPicker } from './stack-picker';
         <span class="text-[10px] tracked" [class]="rarityClass()">{{ rarity() }}</span>
       </header>
 
-      <div class="space-y-4 p-4">
+      <div class="space-y-5 p-4 pb-5">
         <label class="block">
           <span class="mb-1.5 block text-[10px] tracked text-paper/55">NAME</span>
           <input
@@ -41,10 +41,12 @@ import { StackPicker } from './stack-picker';
 
         <hh-stack-picker [slot]="slot()" />
 
-        <div class="border-2 border-dashed border-sun/40 bg-goa-deep px-3 py-2.5">
-          <p class="text-[9px] tracked text-sun/60">BUILDER CLASS</p>
-          <p class="mt-0.5 font-display text-xl leading-tight text-sun">{{ className() }}</p>
-          <p class="mt-0.5 text-[10px] text-paper/55">{{ classSub() }}</p>
+        <div class="border-t-2 border-paper/10 pt-5">
+          <div class="border-2 border-dashed border-sun/40 bg-goa-deep px-3 py-3">
+            <p class="text-[9px] tracked text-sun/60">BUILDER CLASS</p>
+            <p class="mt-1 font-display text-xl leading-tight text-sun">{{ className() }}</p>
+            <p class="mt-1 text-[10px] leading-relaxed text-paper/55">{{ classSub() }}</p>
+          </div>
         </div>
       </div>
     </section>

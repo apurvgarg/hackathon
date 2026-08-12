@@ -26,7 +26,7 @@ import { SlotPanel } from './slot-panel';
       </div>
 
       <div class="grid gap-6 lg:grid-cols-[minmax(0,480px)_minmax(0,1fr)] lg:gap-8">
-        <div class="order-2 space-y-5 lg:order-1">
+        <div class="order-2 space-y-7 lg:order-1">
           <hh-crew-picker />
 
           @for (slot of store.activeSlots(); track slot) {

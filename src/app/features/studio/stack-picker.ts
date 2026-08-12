@@ -1,14 +1,14 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { Slot } from '../../domain/models';
 import { StudioStore } from '../../state/studio.store';
-import { STACK_PRINT_LIMIT, TECH_GROUPS, VIBES } from '../../domain/taxonomy';
+import { STACK_PRINT_LIMIT, TECH_BY_ID, TECH_GROUPS, VIBES } from '../../domain/taxonomy';
 
 @Component({
   selector: 'hh-stack-picker',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="space-y-4">
-      <div class="flex items-baseline justify-between">
+    <div class="space-y-5">
+      <div class="flex items-baseline justify-between gap-2">
         <p class="text-[11px] tracked text-paper/60">BEACH BAG</p>
         <p class="text-[10px] tracked text-paper/40">
           {{ chosen().length }} TAGGED
@@ -18,11 +18,34 @@ import { STACK_PRINT_LIMIT, TECH_GROUPS, VIBES } from '../../domain/taxonomy';
         </p>
       </div>
 
-      <div class="max-h-64 space-y-3 overflow-y-auto no-scrollbar pr-1">
-        @for (group of groups; track group.id) {
+      @if (chosen().length) {
+        <div class="flex flex-wrap gap-2 border-b-2 border-paper/10 pb-4">
+          @for (id of chosen(); track id) {
+            <button
+              type="button"
+              (click)="store.toggleTech(slot(), id)"
+              class="press flex items-center gap-1.5 rounded-full border-2 border-ink bg-sun px-2.5 py-1 text-[10px] font-bold text-ink"
+            >
+              {{ labelOf(id) }}
+              <span class="text-neon-deep">✕</span>
+            </button>
+          }
+        </div>
+      }
+
+      <input
+        type="search"
+        [value]="query()"
+        (input)="onQuery($event)"
+        placeholder="filter — java, spring, aws, figma…"
+        class="w-full border-2 border-paper/25 bg-goa-deep px-3 py-2 text-xs text-paper placeholder:text-paper/30 focus:border-sun"
+      />
+
+      <div class="max-h-[19rem] space-y-4 overflow-y-auto no-scrollbar pr-1">
+        @for (group of visibleGroups(); track group.id) {
           <div>
-            <p class="mb-1.5 text-[9px] tracked-wide text-sun/60">{{ group.label }}</p>
-            <div class="flex flex-wrap gap-1.5">
+            <p class="mb-2 text-[9px] tracked-wide text-sun/60">{{ group.label }}</p>
+            <div class="flex flex-wrap gap-2">
               @for (tag of group.tags; track tag.id) {
                 <button
                   type="button"
@@ -40,12 +63,16 @@ import { STACK_PRINT_LIMIT, TECH_GROUPS, VIBES } from '../../domain/taxonomy';
               }
             </div>
           </div>
+        } @empty {
+          <p class="py-4 text-center text-[11px] text-paper/40">
+            nothing matches “{{ query() }}”
+          </p>
         }
       </div>
 
-      <div>
-        <p class="mb-1.5 text-[9px] tracked-wide text-sun/60">ONE VIBE</p>
-        <div class="flex flex-wrap gap-1.5">
+      <div class="pt-1">
+        <p class="mb-2 text-[9px] tracked-wide text-sun/60">ONE VIBE</p>
+        <div class="flex flex-wrap gap-2">
           @for (vibe of vibes; track vibe.id) {
             <button
               type="button"
@@ -70,10 +97,29 @@ export class StackPicker {
   readonly store = inject(StudioStore);
   readonly slot = input.required<Slot>();
 
-  readonly groups = TECH_GROUPS;
   readonly vibes = VIBES;
   readonly printLimit = STACK_PRINT_LIMIT;
+  readonly query = signal('');
 
   readonly chosen = computed(() => this.store.inputs()[this.slot()].stack);
   readonly current = computed(() => this.store.inputs()[this.slot()].vibe);
+
+  readonly visibleGroups = computed(() => {
+    const q = this.query().trim().toLowerCase();
+    if (!q) return TECH_GROUPS;
+    return TECH_GROUPS.map((group) => ({
+      ...group,
+      tags: group.tags.filter(
+        (tag) => tag.label.toLowerCase().includes(q) || tag.id.includes(q),
+      ),
+    })).filter((group) => group.tags.length > 0);
+  });
+
+  labelOf(id: string): string {
+    return TECH_BY_ID.get(id)?.label ?? id;
+  }
+
+  onQuery(event: Event): void {
+    this.query.set((event.target as HTMLInputElement).value);
+  }
 }
