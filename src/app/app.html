@@ -28,8 +28,21 @@
         <a
           routerLink="/studio"
           class="press border-2 border-ink bg-sun px-2.5 py-1.5 text-[10px] font-bold tracked text-ink hard-shadow-sm sm:px-4 sm:py-2 sm:text-xs"
-          >MAKE A SHEET</a
+          >{{ store.hasWork() ? 'RESUME SHEET' : 'MAKE A SHEET' }}</a
         >
+      } @else if (store.hasWork()) {
+        <button
+          type="button"
+          (click)="actions.startOver()"
+          class="press border-2 px-2.5 py-1.5 text-[10px] font-bold tracked hard-shadow-sm sm:px-4 sm:py-2 sm:text-xs"
+          [class]="
+            actions.arming()
+              ? 'border-ink bg-neon text-paper'
+              : 'border-ink bg-paper text-goa-deep hover:bg-sun'
+          "
+        >
+          {{ actions.arming() ? 'TAP AGAIN TO CLEAR' : 'START OVER' }}
+        </button>
       }
     </div>
   </nav>

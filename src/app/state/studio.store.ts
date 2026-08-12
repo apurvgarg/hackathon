@@ -119,6 +119,19 @@ export class StudioStore {
     this.activeSlots().some((slot) => this.inputs()[slot].stack.length > 0),
   );
 
+  readonly hasWork = computed(() => {
+    if (this.crew() > 1) return true;
+    return SLOTS.some((slot) => {
+      const input = this.inputs()[slot];
+      return (
+        !!input.name.trim() ||
+        input.stack.length > 0 ||
+        !!input.vibe ||
+        !!this.photos()[slot].blob
+      );
+    });
+  });
+
   readonly readyToShare = computed(
     () => this.complete() && !!this.exportBlob() && !this.rendering(),
   );
@@ -190,6 +203,19 @@ export class StudioStore {
   setVibe(slot: Slot, id: string | null): void {
     const current = this.inputs()[slot].vibe;
     this.patchInput(slot, { vibe: current === id ? null : id });
+  }
+
+  reset(): void {
+    for (const slot of SLOTS) {
+      this.revokeUrl(slot);
+      void this.render.setPhoto(slot, null);
+    }
+    this.inputs.set({ 0: emptyInput(0), 1: emptyInput(1), 2: emptyInput(2) });
+    this.photos.set({ 0: emptyPhoto(0), 1: emptyPhoto(1), 2: emptyPhoto(2) });
+    this.crew.set(1);
+    this.salt.set(0);
+    this.exportBlob.set(null);
+    this.toast.push('Cleared. Fresh sheet.', 'ok', 2400);
   }
 
   reroll(): void {

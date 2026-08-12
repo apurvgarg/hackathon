@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@ang
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
+import { ExportActions } from './share/export-actions';
 import { StudioStore } from './state/studio.store';
 import { Toaster } from './ui/toaster';
 
@@ -12,7 +13,8 @@ import { Toaster } from './ui/toaster';
   templateUrl: './app.html',
 })
 export class App implements OnInit {
-  private readonly store = inject(StudioStore);
+  readonly store = inject(StudioStore);
+  readonly actions = inject(ExportActions);
   private readonly router = inject(Router);
 
   readonly inStudio = signal(false);

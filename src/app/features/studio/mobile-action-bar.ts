@@ -1,15 +1,23 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ExportActions } from '../../share/export-actions';
 import { StudioStore } from '../../state/studio.store';
+import { PasteHint } from './paste-hint';
 
 @Component({
   selector: 'hh-mobile-action-bar',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [PasteHint],
   template: `
     <div
       class="fixed inset-x-0 bottom-0 z-40 border-t-2 border-ink bg-goa-deep/97 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
     >
       <div class="mx-auto max-w-3xl px-3 pt-2.5 pb-3">
+        @if (actions.pasteHint()) {
+          <div class="mb-2">
+            <hh-paste-hint />
+          </div>
+        }
+
         <div class="mb-2 flex items-center justify-between gap-3">
           <span
             class="min-w-0 flex-1 truncate text-[10px] tracked"

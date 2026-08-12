@@ -1,11 +1,14 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ExportActions } from '../../share/export-actions';
+import { PasteHint } from './paste-hint';
 
 @Component({
   selector: 'hh-export-bar',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [PasteHint],
   template: `
     <div class="space-y-2">
+      <hh-paste-hint />
       <div class="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1.3fr]">
         <button
           type="button"
@@ -26,7 +29,7 @@ import { ExportActions } from '../../share/export-actions';
         </button>
       </div>
 
-      <div class="flex flex-wrap items-center justify-between gap-2">
+      <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <button
           type="button"
           [disabled]="!actions.canReroll()"
@@ -40,6 +43,7 @@ import { ExportActions } from '../../share/export-actions';
         >
           REROLL THE CLASS
         </button>
+
         <span
           class="text-[10px] tracked"
           [class]="actions.complete() ? 'text-paper/35' : 'text-sun'"

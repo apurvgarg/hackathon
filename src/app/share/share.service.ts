@@ -17,12 +17,40 @@ function canShareFiles(file: File): boolean {
     : false;
 }
 
+function probeNative(): boolean {
+  try {
+    const probe = new File([new Uint8Array([0])], 'probe.png', { type: 'image/png' });
+    return canShareFiles(probe);
+  } catch {
+    return false;
+  }
+}
+
 @Injectable({ providedIn: 'root' })
 export class ShareService {
   readonly lastTier = signal<ShareTier | null>(null);
   readonly busy = signal(false);
+  readonly nativeCapable = signal(false);
+  readonly pasteHint = signal(false);
 
-  constructor(private readonly toast: ToastService) {}
+  constructor(private readonly toast: ToastService) {
+    this.nativeCapable.set(probeNative());
+  }
+
+  dismissHint(): void {
+    this.pasteHint.set(false);
+  }
+
+  async copyImage(blob: Blob): Promise<boolean> {
+    try {
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      this.toast.push('Copied again. Paste with Ctrl+V.', 'ok', 3000);
+      return true;
+    } catch {
+      this.toast.push('Could not copy. Use SAVE .PNG instead.', 'bad', 4000);
+      return false;
+    }
+  }
 
   captionFor(spec: SheetSpec): string {
     const names = spec.people.map((p) => p.name).join(' + ');
@@ -51,6 +79,7 @@ export class ShareService {
 
   save(blob: Blob, spec: SheetSpec): void {
     downloadBlob(blob, this.filenameFor(spec));
+    this.pasteHint.set(false);
     this.toast.push('Sheet saved as PNG.', 'ok');
   }
 
@@ -66,10 +95,12 @@ export class ShareService {
             files: [file],
             text,
           });
+          this.pasteHint.set(false);
           this.lastTier.set('native');
           return 'native';
         } catch (error) {
           if (error instanceof DOMException && error.name === 'AbortError') {
+            this.pasteHint.set(false);
             this.lastTier.set('native');
             return 'native';
           }
@@ -79,15 +110,15 @@ export class ShareService {
       try {
         const item = new ClipboardItem({ 'image/png': blob });
         await navigator.clipboard.write([item]);
-        this.openIntent(text);
-        this.toast.push('Sheet copied. Paste it into the post with Ctrl+V.', 'warn', 7000);
+        this.pasteHint.set(true);
         this.lastTier.set('clipboard');
+        this.openIntent(text);
         return 'clipboard';
       } catch {
         downloadBlob(blob, this.filenameFor(spec));
-        this.openIntent(text);
-        this.toast.push('Sheet downloaded. Attach it to the post.', 'warn', 7000);
+        this.pasteHint.set(true);
         this.lastTier.set('download');
+        this.openIntent(text);
         return 'download';
       }
     } finally {

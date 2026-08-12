@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AboutSection } from '../about/about.section';
+import { StudioStore } from '../../state/studio.store';
 import { Marquee } from '../../ui/marquee';
 
 @Component({
@@ -38,7 +39,7 @@ import { Marquee } from '../../ui/marquee';
           <a
             routerLink="/studio"
             class="press border-2 border-ink bg-sun px-7 py-4 text-xs font-bold tracked text-ink hard-shadow"
-            >PRINT MY SHEET</a
+            >{{ store.hasWork() ? 'RESUME MY SHEET' : 'PRINT MY SHEET' }}</a
           >
           <a
             href="#how"
@@ -115,13 +116,15 @@ import { Marquee } from '../../ui/marquee';
         <a
           routerLink="/studio"
           class="press mt-8 inline-block border-2 border-ink bg-sun px-8 py-4 text-xs font-bold tracked text-ink hard-shadow"
-          >OPEN THE STUDIO</a
+          >{{ store.hasWork() ? 'BACK TO MY SHEET' : 'OPEN THE STUDIO' }}</a
         >
       </div>
     </section>
   `,
 })
 export class LandingPage {
+  readonly store = inject(StudioStore);
+
   readonly stats = [
     { v: '1–3', k: 'BUILDERS PER SHEET' },
     { v: '60', k: 'BUILDER CLASSES' },
