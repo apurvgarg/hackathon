@@ -89,6 +89,7 @@ export interface PersonSpec {
   name: string;
   crop: CropRect | null;
   hasPhoto: boolean;
+  loading: boolean;
   className: string;
   classSub: string;
   rarity: Rarity;

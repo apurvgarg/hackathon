@@ -253,16 +253,21 @@ export class StudioStore {
       url: URL.createObjectURL(source.blob),
       width: source.width,
       height: source.height,
+      faces: [],
+      allLandmarks: [],
+      chosenFace: -1,
+      face: null,
+      landmarks: null,
+      crop: null,
       status: 'detecting',
       message: 'finding your face',
-      crop: solveFaceCrop(null, null, source.width, source.height),
     });
-
-    await this.render.setPhoto(slot, source.blob);
 
     const result = await this.vision.detect(source.blob);
     const face = result.chosen >= 0 ? result.faces[result.chosen] : null;
     const landmarks = result.chosen >= 0 ? (result.landmarks[result.chosen] ?? null) : null;
+
+    await this.render.setPhoto(slot, source.blob);
 
     this.patchPhoto(slot, {
       faces: result.faces,

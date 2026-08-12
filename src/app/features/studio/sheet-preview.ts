@@ -32,9 +32,13 @@ import { StudioStore } from '../../state/studio.store';
 
         @if (store.detecting()) {
           <span
-            class="absolute left-2 top-2 border-2 border-ink bg-neon px-2 py-1 text-[9px] font-bold tracked text-paper"
-            >DETECTING FACE</span
+            class="absolute left-2 top-2 flex items-center gap-1.5 border-2 border-ink bg-neon px-2 py-1 text-[9px] font-bold tracked text-paper"
           >
+            <span
+              class="size-2.5 animate-spin rounded-full border-2 border-paper border-t-transparent"
+            ></span>
+            FINDING FACE
+          </span>
         }
       </div>
 

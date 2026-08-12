@@ -26,9 +26,9 @@ function placeholder(ctx: Ctx, person: PersonSpec, r: number): void {
   ctx.fillText(person.initials, 0, -r * 0.04);
 
   font(ctx, 'mono', 11.5, 700);
-  ctx.fillStyle = PALETTE.cream;
-  ctx.globalAlpha = 0.76;
-  drawTracked(ctx, 'DROP A PHOTO', 0, r * 0.46, 2, 'center');
+  ctx.fillStyle = person.loading ? PALETTE.yellow : PALETTE.cream;
+  ctx.globalAlpha = person.loading ? 1 : 0.76;
+  drawTracked(ctx, person.loading ? 'FINDING FACE' : 'DROP A PHOTO', 0, r * 0.46, 2, 'center');
   ctx.globalAlpha = 1;
 }
 

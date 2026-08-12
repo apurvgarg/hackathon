@@ -48,11 +48,13 @@ export function buildSpec(src: SpecSources): SheetSpec {
     const input = src.inputs[slot];
     const photo = src.photos[slot];
     const cls = generateClass(input, src.salt);
+    const settled = photo.status === 'ready' || photo.status === 'no-face';
     return {
       slot,
       name: displayName(input.name, PLACEHOLDER[slot]),
       crop: photo.crop,
-      hasPhoto: !!photo.blob && photo.status !== 'error',
+      hasPhoto: settled && !!photo.blob,
+      loading: photo.status === 'decoding' || photo.status === 'detecting',
       className: cls.title,
       classSub: cls.subtitle,
       rarity: cls.rarity,
