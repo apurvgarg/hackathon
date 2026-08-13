@@ -106,7 +106,7 @@ export function paintLockup({ ctx, spec }: PaintInput): void {
 
   font(ctx, 'mono', 11.5, 700);
   ctx.fillStyle = PALETTE.pinkDeep;
-  drawTracked(ctx, `GOA, INDIA · ${spec.stamp} · #FRAMEINGOA`, g, REGION.ruleY - 13, 1.8);
+  drawTracked(ctx, `GOA, INDIA · ${spec.stamp}`, g, REGION.ruleY - 13, 1.8);
   ctx.restore();
 
   seal(ctx, spec.stamp);
