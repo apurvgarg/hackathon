@@ -44,11 +44,9 @@ import { PasteHint } from './paste-hint';
           REROLL THE CLASS
         </button>
 
-        <span
-          class="text-[10px] tracked"
-          [class]="actions.complete() ? 'text-paper/35' : 'text-sun'"
-          >{{ actions.hint() }}</span
-        >
+        @if (actions.hint()) {
+          <span class="text-[10px] tracked text-sun">{{ actions.hint() }}</span>
+        }
       </div>
     </div>
   `,

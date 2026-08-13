@@ -42,12 +42,6 @@ import { StudioStore } from '../../state/studio.store';
         }
       </div>
 
-      <figcaption
-        class="mt-2 flex flex-wrap items-center justify-between gap-2 text-[10px] tracked text-paper/45"
-      >
-        <span>{{ width }}×{{ height }} · EXPORTS AT 2× · {{ store.spec().receipt.serial }}</span>
-        <span>{{ store.filledCount() }}/{{ store.crew() }} PHOTOS</span>
-      </figcaption>
     </figure>
   `,
 })

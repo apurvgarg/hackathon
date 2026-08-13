@@ -23,13 +23,7 @@ export class ExportActions {
   readonly hint = computed(() => {
     const gaps = this.store.missing();
     if (gaps.length) return `STILL NEED: ${gaps.slice(0, 3).join(', ')}`;
-    const tier = this.share.lastTier();
-    if (tier === 'native') return 'SHARED WITH THE IMAGE ATTACHED';
-    if (tier === 'clipboard') return 'PASTE IT IN THE POST BOX';
-    if (tier === 'download') return 'ATTACH THE DOWNLOADED FILE';
-    return this.share.nativeCapable()
-      ? 'ONE TAP ATTACHES THE PNG'
-      : 'COPIES THE IMAGE, THEN YOU PASTE IT';
+    return '';
   });
 
   dismissHint(): void {

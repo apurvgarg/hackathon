@@ -19,11 +19,9 @@ import { PasteHint } from './paste-hint';
         }
 
         <div class="mb-2 flex items-center justify-between gap-3">
-          <span
-            class="min-w-0 flex-1 truncate text-[10px] tracked"
-            [class]="actions.complete() ? 'text-paper/40' : 'text-sun'"
-            >{{ actions.hint() }}</span
-          >
+          <span class="min-w-0 flex-1 truncate text-[10px] tracked text-sun">{{
+            actions.hint()
+          }}</span>
 
           <button
             type="button"
@@ -56,9 +54,6 @@ import { PasteHint } from './paste-hint';
           </button>
         </div>
 
-        <p class="mt-1.5 text-center text-[9px] tracked text-paper/30">
-          {{ store.filledCount() }}/{{ store.crew() }} PHOTOS · {{ store.spec().receipt.serial }}
-        </p>
       </div>
     </div>
   `,
