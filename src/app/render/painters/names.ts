@@ -27,21 +27,13 @@ export function paintNames({ ctx, spec }: PaintInput): void {
     fitFont(ctx, person.name, max, 'display', 600, size, 26);
     outlinedText(ctx, person.name, g, y, PALETTE.yellow, PALETTE.green, 5);
 
-    font(ctx, 'mono', 12.5, 700);
-    ctx.fillStyle = PALETTE.pinkDeep;
-    drawTracked(ctx, truncate(ctx, person.className, max), g, y + 24, 1.4);
+    if (spec.crew > 1) {
+      font(ctx, 'mono', 12.5, 700);
+      ctx.fillStyle = PALETTE.pinkDeep;
+      drawTracked(ctx, truncate(ctx, person.className, max), g, y + 24, 1.4);
+    }
   });
 
-  ctx.restore();
-}
-
-export function paintSoloSubtitle({ ctx, spec }: PaintInput): void {
-  if (spec.crew !== 1) return;
-  ctx.save();
-  ctx.fillStyle = PALETTE.green;
-  ctx.globalAlpha = 0.8;
-  font(ctx, 'mono', 13.5, 400);
-  ctx.fillText(spec.people[0].classSub, REGION.gutter, REGION.namesTop + 168);
   ctx.restore();
 }
 
@@ -55,7 +47,7 @@ export function paintStackRail({ ctx, spec }: PaintInput): void {
   const all = hidden > 0 ? [...shown, `+${hidden}`] : shown;
 
   let x = REGION.gutter;
-  let y = REGION.namesTop + 208;
+  let y = REGION.namesTop + 162;
   ctx.save();
   for (const item of all) {
     const text = item.toUpperCase();
@@ -65,7 +57,7 @@ export function paintStackRail({ ctx, spec }: PaintInput): void {
     if (x + w > REGION.gutter + REGION.leftWidth) {
       x = REGION.gutter;
       y += 32;
-      if (y > REGION.namesTop + 244) break;
+      if (y > REGION.namesTop + 230) break;
     }
     ctx.fillStyle = extra ? PALETTE.pinkDeep : PALETTE.green;
     ctx.beginPath();

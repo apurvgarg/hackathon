@@ -158,26 +158,32 @@ export function paintFoot(input: PaintInput): void {
   ctx.restore();
 
   const top = y + pad + 4;
-
-  const stackItems =
-    spec.crew === 1
-      ? spec.people[0].stack
-      : spec.synergy?.overlap.length
-        ? spec.synergy.overlap
-        : [...new Set(spec.people.flatMap((p) => p.stack))];
-
-  label(ctx, spec.crew === 1 ? 'BEACH BAG' : 'SHARED STACK', c1.x, top);
-  chips(ctx, stackItems.length ? stackItems : ['UNDECLARED'], c1.x, top + 32, c1.w);
-
+  const solo = spec.crew === 1;
   const vibes = spec.people.map((p) => p.vibe).filter((v): v is string => !!v);
-  if (vibes.length) {
+
+  const vibeLine = (x: number, vy: number, room: number) => {
+    if (!vibes.length) return;
     ctx.save();
     ctx.fillStyle = PALETTE.cream;
     ctx.globalAlpha = 0.62;
     font(ctx, 'mono', 10.5, 400);
-    drawTracked(ctx, truncate(ctx, vibes.join(' · ').toUpperCase(), c1.w), c1.x, top + 96, 1);
+    drawTracked(ctx, truncate(ctx, vibes.join(' · ').toUpperCase(), room), x, vy, 1);
     ctx.restore();
+  };
+
+  if (solo) {
+    classColumn(ctx, spec, c1.x, top, c2.w);
+    vibeLine(c1.x, top + 96, c2.w);
+    return;
   }
+
+  const overlap = spec.synergy?.overlap.length
+    ? spec.synergy.overlap
+    : [...new Set(spec.people.flatMap((p) => p.stack))];
+
+  label(ctx, 'SHARED STACK', c1.x, top);
+  chips(ctx, overlap.length ? overlap : ['UNDECLARED'], c1.x, top + 32, c1.w);
+  vibeLine(c1.x, top + 96, c1.w);
 
   classColumn(ctx, spec, c2.x, top, c2.w);
 

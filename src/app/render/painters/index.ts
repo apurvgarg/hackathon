@@ -2,7 +2,7 @@ import { paintFoil } from './foil';
 import { paintFoot } from './foot';
 import { paintFrame } from './frame';
 import { paintLockup } from './lockup';
-import { paintNames, paintSoloSubtitle, paintStackRail } from './names';
+import { paintNames, paintStackRail } from './names';
 import { paintPaper } from './paper';
 import { paintPeople } from './people';
 import { paintReceipt } from './receipt';
@@ -13,7 +13,6 @@ export const CHAIN: Painter[] = [
   paintFrame,
   paintLockup,
   paintNames,
-  paintSoloSubtitle,
   paintStackRail,
   paintPeople,
   paintFoot,
