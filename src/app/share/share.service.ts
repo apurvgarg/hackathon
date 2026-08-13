@@ -5,7 +5,7 @@ import { SheetSpec } from '../domain/models';
 
 export type ShareTier = 'clipboard' | 'download' | 'failed';
 
-const INTENT = 'https://x.com/intent/post';
+const INTENT = 'https://twitter.com/intent/tweet';
 
 @Injectable({ providedIn: 'root' })
 export class ShareService {
@@ -26,8 +26,7 @@ export class ShareService {
       line,
       `sheet id ${spec.receipt.serial}`,
       ``,
-      `make yours: pick 1-3 builders, drop a photo, it die-cuts itself.`,
-      `#FrameInGoa`,
+      `make yours: 1-3 builders, drop a photo, it die-cuts itself. #FrameInGoa`,
     ].join('\n');
   }
 
