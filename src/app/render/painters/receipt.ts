@@ -60,10 +60,6 @@ export function paintReceipt({ ctx, spec }: PaintInput): void {
   font(ctx, 'mono', 13, 700);
   drawTracked(ctx, serial, col.x, top + 82, 1.2);
 
-  ctx.fillStyle = PALETTE.pink;
-  font(ctx, 'mono', 11.5, 700);
-  drawTracked(ctx, '#FRAMEINGOA', col.x, top + 104, 1.6);
-
   qr(ctx, matrix, qx, top + 14, size);
 
   ctx.fillStyle = PALETTE.cream;
