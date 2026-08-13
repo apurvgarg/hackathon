@@ -9,6 +9,15 @@ const IOU_MERGE = 0.35;
 const TILE_SPAN = 0.6;
 const TILE_STEP = 0.4;
 
+const FULL_MIN_SCORE = 0.75;
+const TILE_MIN_SCORE = 0.88;
+const RESCUE_MIN_SCORE = 0.6;
+
+const MIN_REL_SIZE = 0.035;
+const MAX_REL_SIZE = 0.95;
+const AR_MIN = 0.55;
+const AR_MAX = 1.9;
+
 interface Found {
   box: FaceBox;
   marks: Landmarks | null;
@@ -94,6 +103,45 @@ function shift(marks: Landmarks | null, dx: number, dy: number): Landmarks | nul
   };
 }
 
+function landmarksSane(marks: Landmarks | null, box: FaceBox): boolean {
+  if (!marks) return true;
+
+  const eyeGap = Math.abs(marks.leftEye.x - marks.rightEye.x);
+  if (eyeGap < box.w * 0.15 || eyeGap > box.w * 0.85) return false;
+
+  const eyeLine = (marks.leftEye.y + marks.rightEye.y) / 2;
+  if (marks.mouth.y <= eyeLine) return false;
+  if (marks.nose.y < eyeLine - box.h * 0.1) return false;
+  if (marks.nose.y > marks.mouth.y + box.h * 0.15) return false;
+
+  const eyeTilt = Math.abs(marks.leftEye.y - marks.rightEye.y);
+  if (eyeTilt > box.h * 0.45) return false;
+
+  const inside = (p: { x: number; y: number }) =>
+    p.x >= box.x - box.w * 0.35 &&
+    p.x <= box.x + box.w * 1.35 &&
+    p.y >= box.y - box.h * 0.35 &&
+    p.y <= box.y + box.h * 1.35;
+
+  return inside(marks.leftEye) && inside(marks.rightEye) && inside(marks.mouth);
+}
+
+function plausible(found: Found, width: number, height: number, minScore: number): boolean {
+  const box = found.box;
+  if (box.score < minScore) return false;
+
+  const ratio = box.w / box.h;
+  if (ratio < AR_MIN || ratio > AR_MAX) return false;
+
+  const shortEdge = Math.min(width, height);
+  const span = Math.max(box.w, box.h);
+  if (span < shortEdge * MIN_REL_SIZE || span > shortEdge * MAX_REL_SIZE) return false;
+
+  if (box.x + box.w < 0 || box.y + box.h < 0 || box.x > width || box.y > height) return false;
+
+  return landmarksSane(found.marks, box);
+}
+
 function intersectionOverUnion(a: FaceBox, b: FaceBox): number {
   const x1 = Math.max(a.x, b.x);
   const y1 = Math.max(a.y, b.y);
@@ -168,11 +216,16 @@ async function detect(request: DetectRequest): Promise<void> {
       return;
     }
 
-    let found = await runTile(net, bitmap, 0, 0, bitmap.width, bitmap.height);
+    const { width, height } = bitmap;
+    const keep = (list: Found[], minScore: number) =>
+      list.filter((entry) => plausible(entry, width, height, minScore));
+
+    let found = keep(await runTile(net, bitmap, 0, 0, width, height), FULL_MIN_SCORE);
 
     if (found.length < 2) {
-      for (const [sx, sy, sw, sh] of tilesFor(bitmap.width, bitmap.height)) {
-        found = found.concat(await runTile(net, bitmap, sx, sy, sw, sh));
+      const bar = found.length === 0 ? RESCUE_MIN_SCORE : TILE_MIN_SCORE;
+      for (const [sx, sy, sw, sh] of tilesFor(width, height)) {
+        found = found.concat(keep(await runTile(net, bitmap, sx, sy, sw, sh), bar));
       }
     }
 
